@@ -1,7 +1,7 @@
 # assembly.py
 from rod import Pin
 import numpy as np
-from config import MOD_RHO, MOD_MU, H_ACTIVE
+from config import MOD_RHO, MOD_MU, H_ACTIVE , MOD_PR, MOD_K
 
 
 class Assembly:
@@ -35,16 +35,27 @@ class Assembly:
 
             f = C / Re**0.18
             mdot_new = np.sqrt(self.MAX_P * 2 * MOD_RHO * A_c**2 / (f * H_ACTIVE / self.pin_D)) #new mdot solving from P
-            print(mdot_new)
+
+
+            Nu = 0.023 * Re**0.8 * MOD_PR**0.4
+            h = Nu * MOD_K / HyD
+
+
+
             history.append(mdot_new)
             if verbose:
-                print(f"  iter {k:2d}: mdot={mdot_new:.10f}  Re={Re:.2e}  f={f:.4f}")
+
+                print(f"  iter {k:2d}: mdot={mdot_new:.10f}  Re={Re:.2e}  f={f:.4f}  h={h:.4f}")
             if abs(mdot_new - mdot) < 1e-9: #tolerance
-                return mdot_new, history, True, k+1
+                print(f"CONVERGED IN k={k}")
+                break
             mdot = mdot_new #
 
-        print("WARNING  MDOT DID NOT CONVERGE")
-        return mdot, Re, history, False, 100
+            if k==99:
+                print("WARNING DID NOT CONVERGE")
+
+
+        return mdot, Re,  history, False, 100
 
     def _build_pins(self, D, clad, H):
         pins = []

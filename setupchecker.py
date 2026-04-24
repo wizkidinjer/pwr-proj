@@ -79,7 +79,7 @@ def run_sweep():
                     assy = core.assemblies[0]
                     assy.MAX_P = c.DP_CORE_MAX
                     assy.P_DIFF = c.DP_CORE_MAX
-                    mdot_assy, *_ = assy.iterate_props(1000,verbose=True)  # initial guess = 1000 kg/s
+                    mdot_assy, *_ = assy.iterate_props(1,verbose=True)  # initial guess = 1000 kg/s
                     mdot_core = mdot_assy * N_assy
 
                     V_assy = core.V_assemblies

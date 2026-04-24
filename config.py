@@ -40,6 +40,8 @@ T_IN            = 290.0          # deg C, core inlet coolant temp
 #water properties
 MOD_RHO = 1000
 MOD_MU = 0.0010518
+MOD_PR = 0.7
+MOD_K = 0.564
 
 
 
