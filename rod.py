@@ -46,3 +46,25 @@ class Pin:
             np.pi * self.H / (2 * H_ex)
         )
         return radial * axial_avg
+
+    def radial_shape(self, R_core):
+        """J0(2.405 r / R). Held constant across rod (thin-rod assumption)."""
+        return j0(2.405 * self.r / R_core)
+
+    def axial_integral(self):
+        """
+        Integral of cos(pi z / H) over z in [-H/2, H/2].
+        Rubric: L_ex = H, so cos goes to zero at rod ends. Returns 2H/pi.
+        """
+        return 2 * self.H / np.pi
+
+    def power(self, R_core, phi_max, N_ff, sigma_f, G_f):
+        """
+        Rod power [W] under thin-rod assumption:
+            P = N_ff * sigma_f * G_f * phi_max
+                * J0(2.405 r_pin / R_core) * A_fuel * (2 H / pi)
+        """
+        return (N_ff * sigma_f * G_f * phi_max
+                * self.radial_shape(R_core)
+                * self.A_fuel
+                * self.axial_integral())
