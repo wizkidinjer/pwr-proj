@@ -18,7 +18,7 @@ from plotter import plot_core_xy
 D_ROD_RANGE      = np.linspace(8.0e-3, 11.0e-3, 5)     # m, rod outer dia
 ASSY_PITCH_RANGE = np.linspace(0.15,    0.25,    5)    # m, assembly edge
 N_SIDE_RANGE     = np.array([15, 17, 19, 21])          # pins per assy edge
-N_ASSY_RANGE     = [89]
+N_ASSY_RANGE     = [51]
 N_SIDE_RANGE = [19]# layouts available
 
 # D_ROD_RANGE = [10.25e-3]
