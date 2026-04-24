@@ -20,9 +20,9 @@ ASSY_PITCH_RANGE = np.linspace(0.15,    0.25,    5)    # m, assembly edge
 N_SIDE_RANGE     = np.array([15, 17, 19, 21])          # pins per assy edge
 N_ASSY_RANGE     = [5, 9, 21, 25]                      # layouts available
 
-D_ROD_RANGE = [10.25e-3]
-ASSY_PITCH_RANGE=[.2]
-N_SIDE_RANGE = [19]
+# D_ROD_RANGE = [10.25e-3]
+# ASSY_PITCH_RANGE=[.2]
+# N_SIDE_RANGE = [19]
 N_ASSY_RANGE=[25]
 # =========================================================================
 # OPTIONAL FILTERS (set None to disable)
@@ -78,7 +78,7 @@ def run_sweep():
                     assy = core.assemblies[0]
                     assy.MAX_P = c.DP_CORE_MAX
                     assy.P_DIFF = c.DP_CORE_MAX
-                    mdot_assy, *_ = assy.iterate_m_dot(1000,verbose=True)  # initial guess = 1 kg/s
+                    mdot_assy, *_ = assy.iterate_m_dot(1000,verbose=True)  # initial guess = 1000 kg/s
                     mdot_core = mdot_assy * N_assy
 
                     V_assy = core.V_assemblies

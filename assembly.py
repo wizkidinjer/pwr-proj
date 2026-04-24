@@ -29,17 +29,21 @@ class Assembly:
             um = mdot / 1000 / A_c
             HyD = 4 * A_c / (np.pi * self.pin_D)
             Re = MOD_RHO * um * HyD / MOD_MU
+
             a, b1, b2 = 0.1339, 0.09059, -0.09926
             C = a + b1 * (self.pin_pitch/self.pin_D - 1) + b2 * (self.pin_pitch/self.pin_D - 1)**2
+
             f = C / Re**0.18
             mdot_new = np.sqrt(self.MAX_P * 2 * MOD_RHO * A_c**2 / (f * H_ACTIVE / self.pin_D))
             print(mdot_new)
             history.append(mdot_new)
             if verbose:
                 print(f"  iter {k:2d}: mdot={mdot_new:.4f}  Re={Re:.2e}  f={f:.4f}")
-            if mdot_new - mdot < 0.01 * mdot:
+            if abs(mdot_new - mdot) < 1e-5:
                 return mdot_new, history, True, k+1
             mdot = mdot_new
+
+        print("WARNING  MDOT DID NOT CONVERGE")
         return mdot, history, False, 100
 
     def _build_pins(self, D, clad, H):
