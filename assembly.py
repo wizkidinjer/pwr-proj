@@ -21,30 +21,30 @@ class Assembly:
         self.cx, self.cy = center_xy
         self.pins = self._build_pins(pin_D, clad_thick, H_active)
 
-    def iterate_m_dot(self, initial_m_dot, verbose=False):
+    def iterate_props(self, initial_m_dot, verbose=False):
         mdot = initial_m_dot
         history = [mdot]
         for k in range(100):
-            A_c = (self.pin_pitch**2 - np.pi * self.pin_D**2 / 4)
-            um = mdot / 1000 / A_c
-            HyD = 4 * A_c / (np.pi * self.pin_D)
+            A_c = (self.pin_pitch**2 - np.pi * self.pin_D**2 / 4) #xs area
+            um = mdot / 1000 / A_c #initial u mean
+            HyD = 4 * A_c / (np.pi * self.pin_D) #hy diameter
             Re = MOD_RHO * um * HyD / MOD_MU
 
-            a, b1, b2 = 0.1339, 0.09059, -0.09926
-            C = a + b1 * (self.pin_pitch/self.pin_D - 1) + b2 * (self.pin_pitch/self.pin_D - 1)**2
+            a, b1, b2 = 0.1339, 0.09059, -0.09926 #constants for friction factor
+            C = a + b1 * (self.pin_pitch/self.pin_D - 1) + b2 * (self.pin_pitch/self.pin_D - 1)**2 #C const for f factor
 
             f = C / Re**0.18
-            mdot_new = np.sqrt(self.MAX_P * 2 * MOD_RHO * A_c**2 / (f * H_ACTIVE / self.pin_D))
+            mdot_new = np.sqrt(self.MAX_P * 2 * MOD_RHO * A_c**2 / (f * H_ACTIVE / self.pin_D)) #new mdot solving from P
             print(mdot_new)
             history.append(mdot_new)
             if verbose:
-                print(f"  iter {k:2d}: mdot={mdot_new:.4f}  Re={Re:.2e}  f={f:.4f}")
-            if abs(mdot_new - mdot) < 1e-5:
+                print(f"  iter {k:2d}: mdot={mdot_new:.10f}  Re={Re:.2e}  f={f:.4f}")
+            if abs(mdot_new - mdot) < 1e-9: #tolerance
                 return mdot_new, history, True, k+1
-            mdot = mdot_new
+            mdot = mdot_new #
 
         print("WARNING  MDOT DID NOT CONVERGE")
-        return mdot, history, False, 100
+        return mdot, Re, history, False, 100
 
     def _build_pins(self, D, clad, H):
         pins = []
