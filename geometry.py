@@ -111,7 +111,7 @@ class Core:
         # vectorized pin positions (for fast J0 sums)
         self._x = np.array([p.x for a in self.assemblies for p in a.pins])
         self._y = np.array([p.y for a in self.assemblies for p in a.pins])
-        self._r = np.hypot(self._x, self._y)
+        self.r = np.hypot(self._x, self._y)
 
         # R_core = max corner distance over all assemblies
         corners = np.array([
@@ -136,7 +136,7 @@ class Core:
 
     # ---- physics ----
     def sum_J0(self):
-        return j0(c.J0_FIRST_ZERO * self._r / self.R_core).sum()
+        return j0(c.J0_FIRST_ZERO * self.r / self.R_core).sum()
 
     def solve_H(self, P_target=c.P_THERMAL):
         """Closed-form H for target power. Mutates pins + self.H. Returns H."""
@@ -158,5 +158,5 @@ class Core:
                 * A_fuel * 2 * self.H / np.pi * self.sum_J0())
 
     def center_pin(self):
-        idx = np.argmin(self._r)
+        idx = np.argmin(self.r)
         return self.all_pins[idx]

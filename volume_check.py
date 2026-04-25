@@ -7,13 +7,14 @@ Output: prints min config, saves best_config.json for main.py.
 """
 import json
 import numpy as np
+from tqdm import tqdm
 import config as c
 from geometry import Core, LAYOUTS
 
 # ============ SWEEP RANGES ============
-D_ROD_RANGE  = np.linspace(8.0e-3, 11.0e-3, 5)
-P_OVER_D_RNG = np.linspace(1.10,   1.40,    7)
-N_SIDE_RANGE = [15, 17, 19, 21]
+D_ROD_RANGE  = np.linspace(1.0e-3, 10.0e-3, 3)
+P_OVER_D_RNG = np.linspace(1.0,   1.4,  30)
+N_SIDE_RANGE = [17]
 N_ASSY_RANGE = sorted(LAYOUTS)            # all 9 layouts
 
 # Optional: skip configs above this rod length for realism (set None to disable)
@@ -23,7 +24,7 @@ H_MAX = None
 def run_sweep():
     best = None
     n_total, n_valid = 0, 0
-    for N_assy in N_ASSY_RANGE:
+    for N_assy in tqdm(N_ASSY_RANGE):
         for N_side in N_SIDE_RANGE:
             for P_over_D in P_OVER_D_RNG:
                 for D_rod in D_ROD_RANGE:
@@ -77,11 +78,25 @@ def main():
     print(f"  R_core         = {best['R_core']*1e3:.2f} mm")
     print(f"  D_core         = {2*best['R_core']:.4f} m")
     print(f"  rod_spacing    = {(best['rod_pitch']-best['D_rod'])*1e3:.3f} mm")
+    print(f"  filled_frac    = {( (best['p_assy']**2*9) / (best['R_core']**2*np.pi) ) :.3f}")
     print("=" * 56)
 
     with open("best_config.json", "w") as f:
         json.dump(best, f, indent=2)
     print(f"\nSaved to best_config.json")
+
+    # rebuild core for plotting
+    from geometry import Core
+    from plotter import plot_core_xy, plot_core_3d
+    import matplotlib.pyplot as plt
+
+    core = Core(best["D_rod"], best["P_over_D"],
+                best["N_side"], best["N_assy"])
+    core.solve_H()
+
+    plot_core_xy(core, savepath="best_xy.png")
+    plot_core_3d(core, show_rods=False, savepath="best_3d.png")
+    plt.show()
 
 
 if __name__ == "__main__":
